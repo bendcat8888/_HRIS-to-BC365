@@ -1,130 +1,75 @@
-# HRIS Overall Payroll to MS Dynamic BC365 Converter
+# 🏦 HRIS to MS Dynamics BC365 Converter
+**Automated Financial Reconciliation & ERP Data Pipeline for Complex Payroll Systems**
 
-Converts an HRIS-exported payroll CSV into an Excel file formatted for import to Microsoft Dynamics 365 Business Central (BC365).
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
+[![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
+[![MS Dynamics](https://img.shields.io/badge/Dynamics_365-0078D4?style=for-the-badge&logo=microsoft-dynamics-365&logoColor=white)](https://dynamics.microsoft.com/)
 
-Includes:
+## 🛠 Tech Stack
 
-- Auto mapping for salary affiliate sharing
-- Automatic calculation of government-mandated contributions (SSS, Pag-IBIG, PhilHealth)
-- Share split rules from `hr_pmr_list.csv` (IPI/SPI/Aldril/Randril/Totalcare) with a built-in fallback rule for Distribution (dept_code=5, sect_code=11)
-- PMR code mapping (HRIS employee code -> BC code) from `hr_pmr_list.csv`
-- Department code mapping (HRIS dept_code -> BC DEPT Code)
-- Auto debit/credit sign handling for payables/deductions (e.g., tax, SSS/PHIC/HDMF, loans, savings)
-- Vendor line handling for selected items (e.g., Maxicare and misc deductions) using `hr_vendor_list.csv`
-- Auto-fills key BC365 fields (Line No, Recurring Method/Frequency, Posting Date, Document No, Description)
-- Simple GUI file picker (Tkinter) and auto-opens the generated Excel output
+| Category | Tools |
+| :--- | :--- |
+| **Language** | **Python 3.12** |
+| **Data Engine** | **Pandas** (ETL - Extract, Transform, Load) |
+| **File Handling** | **OpenPyXL** (Excel XLSX Generation) |
+| **GUI** | **Tkinter** (Lightweight Desktop Interface) |
+| **Business Logic** | Custom Rules Engine for Affiliate Cost-Sharing & Tax Calculations |
 
-## Output Columns
+---
 
-- Line No
-- Recurring Method
-- Recurring Frequency
-- External Document No.
-- Posting Date
-- Document Type
-- Document No.
-- Account Type
-- Account No
-- Description
-- Amount
-- PMR Code
-- DEPT Code
+## 🎯 Project Overview
+This specialized ETL tool automates the bridge between **HRIS Payroll Exports** and **Microsoft Dynamics 365 Business Central (BC365)**. It transforms raw employee compensation data into a structured, validated General Ledger (GL) import file, handling complex affiliate splits and government contribution logic that would otherwise require hours of manual calculation.
 
-## Input CSV (HRIS Export)
+### 🌟 High-Value Business Logic
+* **Affiliate Cost-Sharing:** Automatically splits salary expenses across multiple legal entities (IPI, SPI, Aldril, Randril, Totalcare) based on per-employee percentage mappings.
+* **Government Contribution Engine:** Real-time calculation of **SSS, PhilHealth (PHIC), and Pag-IBIG (HDMF)** employer/employee shares, including specialized logic for EC (Employees' Compensation) contributions.
+* **Smart Sign Handling:** Automatically manages Debit/Credit signs for payables vs. deductions to ensure the trial balance remains consistent during ERP import.
 
-The script expects an HRIS payroll export CSV that contains (at minimum) these columns:
+---
 
-```text
-first_name, last_name, mid_name, emp_code,
-dept_code, dept_name, group_code, sect_code,
-basic_pay, w_tax,
-sss_ee, sss_er, ecc_er,
-med_ee, med_er,
-pagibig_ee, pagibig_er,
-late_amt, abs_amt, under_amt,
-ot_amt, net_pay, other_tax_earn,
-loan_savings, savings, loan_pagibig, loan_sss,
-loan_housing, bond_tablet, bond_cash
-```
+## 🚀 Key Professional Capabilities
 
-If your export is missing any of these, the script may fail with a KeyError during processing.
+### 📊 Financial Data Transformation
+* **Vendor Line Mapping:** Intelligently identifies deductions for specific vendors (e.g., Maxicare, Insurance) and maps them to verified Vendor Account IDs in BC365.
+* **Complex Mapping Tables:** Cross-references HRIS employee codes to BC365 PMR codes and Department codes using external lookup tables (`hr_pmr_list.csv`).
+* **Validation & Safety:** Includes fallback rules (e.g., Department/Section defaults) to ensure the script never fails on missing or unexpected data points.
 
-## Business Rules (Highlights)
+### 🛡️ Enterprise Data Engineering
+* **Statutory Compliance:** Built-in logic for 15th/30th period variations in HDMF contributions.
+* **Automated BC365 Formatting:** Auto-fills required enterprise fields: Line Numbers, Recurring Methods, Posting Dates, and Document Types.
+* **Secure Local Execution:** Designed as a "Zero-Cloud" local utility to ensure sensitive payroll and compensation data never leaves the secure internal network.
 
-- Affiliate sharing: reads per-employee share percentages from `hr_pmr_list.csv` (IPI/SPI/Aldril/Randril/Totalcare) and applies a default split for Distribution (dept_code=5, sect_code=11) when no explicit share is found.
-- Government-mandated contributions:
-  - SSS Contribution Payable = sss_ee + sss_er + ecc_er
-  - PHIC Contribution Payable = med_ee + med_er
-  - HDMF Contribution Payable = pagibig_ee + pagibig_er
-  - EC - PHIC = PHIC Contribution Payable / 2
-  - EC - SSS = sss_er + ecc_er
-  - EC - HDMF = 200 when Document No contains "15", else 0
-- Vendor lines:
-  - MAXICARE / MISC SMART / MISCELLANEOUS / PERSONAL MEDICINES are converted to Vendor lines using `hr_vendor_list.csv` (by employee FullName).
-  - Affiliate categories are mapped to Vendor accounts: SPI=AF0019, Aldril=AF0025, Randril=AF0007, Totalcare=AF0020.
+---
 
-## Data Privacy & Security
+## ⚙️ Development & Quick Start
 
-- The script does not require credentials and does not call external services; it reads local CSV files and writes a local Excel output.
-- Payroll exports contain personal and compensation data; avoid committing real HRIS exports and real mapping files to public repositories.
+### Requirements
+- **Python 3.9+**
+- **Libraries:** `pandas`, `openpyxl`
 
-## What It Produces
-
-- An `.xlsx` file named `Converted_To_BC365_Format_<timestamp>.xlsx`
-- Output opens automatically after generation
-
-## Requirements
-
-- Windows
-- Python 3.9+
-- Python packages:
-  - pandas
-  - openpyxl
-
-Install dependencies:
-
+### Installation
 ```powershell
-py -3.9 -m pip install pandas openpyxl
+pip install pandas openpyxl
 ```
 
-## Required Supporting Files
+**Usage Workflow**
+1. Initialize: Run the script to launch the Tkinter GUI.
+2. Configure: Enter the target Document Number (e.g., PAYROLL_MARCH_2026).
+3. Process: Select the HRIS CSV export.
+4. Review: The system generates a validated .xlsx file and opens it automatically for final audit.
 
-Place these CSV files in the same folder as the script (or run the script from the folder that contains them):
+---
 
-- `hr_pmr_list.csv`
-  - Required columns: `IHRIS`, `BC`
-  - Optional share columns (used for account splitting): `IPI`, `SPI`, `Aldril`, `Randril`, `Totalcare`
-- `hr_vendor_list.csv`
-  - Required columns: `Name`, `No_`
+## 📜 License & Intellectual Property
+**Copyright (c) 2026 Benedic Cater / InnoGen Pharmaceuticals Inc. (Solvang)**
 
-Do not commit real employee/vendor mapping files to a public repository.
+**All Rights Reserved.**
+This repository is published for **portfolio review and technical demonstration purposes only.**
 
-## Suggested .gitignore
+**Strict Restrictions:**
+- **No Reproduction:** No part of this code may be copied, modified, or distributed.
+- **Brand Protection:** Use of the "InnoGen" or "Solvang" name, branding, or logos is strictly prohibited.
+- **Data Privacy:** Use of any proprietary data or business logic contained herein for commercial or personal projects is strictly prohibited.
 
-```gitignore
-__pycache__/
-*.pyc
-Converted_To_BC365_Format_*.xlsx
-hr_pmr_list.csv
-hr_vendor_list.csv
-```
+_For professional inquiries or permission requests, please contact Benedic Cater._
 
-## Usage
-
-Run the script:
-
-```powershell
-py -3.9 "HRIS_to_BC365 V3.py"
-```
-
-Workflow:
-
-1. Enter a Document No. (example: `PAYJANUARY`)
-2. Click `Browse and Process...` and select the HRIS CSV export
-3. The converted Excel file is generated and opened
-
-## Quick Syntax Check
-
-```powershell
-py -3.9 -m py_compile "HRIS_to_BC365 V3.py"
-```
