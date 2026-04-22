@@ -61,7 +61,7 @@ pip install pandas openpyxl
 ---
 
 ## 📜 License & Intellectual Property
-**Copyright (c) 2026 Benedic Cater / InnoGen Pharmaceuticals Inc. (Solvang)**
+**Copyright (c) 2026 Benedic Cater / InnoGen Pharmaceuticals Inc.**
 
 **All Rights Reserved.**
 This repository is published for **portfolio review and technical demonstration purposes only.**
